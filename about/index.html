@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- BASE:START (managed by Coding Agent — do not edit) -->
+<base href="/acme-multipage-test/">
+<!-- BASE:END -->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..700,30..100&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+<!-- SEO Meta Tags -->
+<title>About — ACME Solutions</title>
+<meta name="description" content="Founded in 2020 by operators who" />
+<meta property="og:title" content="About — ACME Solutions" />
+<meta property="og:description" content="Founded in 2020 by operators who" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="About — ACME Solutions" />
+<meta name="twitter:description" content="Founded in 2020 by operators who" />
+<!-- End SEO Meta Tags -->
+
+<script data-field-replace>
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var fields={};
+  var paramMap={
+    'first_name':'firstName','last_name':'lastName','full_name':'fullName',
+    'email':'email','phone':'phone','company':'company',
+    'city':'city','state':'state','country':'country'
+  };
+  var skipTags={'SCRIPT':1,'STYLE':1,'NOSCRIPT':1,'TEXTAREA':1,'CODE':1,'PRE':1};
+  var hasUrlFields=false;
+  for(var p in paramMap){
+    var v=params.get(p);
+    if(v){fields[paramMap[p]]=v;hasUrlFields=true;}
+  }
+  var contactId=params.get('contact_id');
+  function esc(s){
+    if(!s)return s;
+    var d=document.createElement('div');
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+  function doReplace(data){
+    var r={};
+    r['{{full_name}}']=esc(((data.firstName||'')+' '+(data.lastName||'')).trim()||((data.fullName||data.name)||''));
+    r['{{first_name}}']=esc(data.firstName||(data.name?data.name.split(' ')[0]:'')||'');
+    r['{{last_name}}']=esc(data.lastName||(data.name&&data.name.indexOf(' ')>-1?data.name.substring(data.name.indexOf(' ')+1):'')||'');
+    r['{{email}}']=esc(data.email||'');
+    r['{{phone}}']=esc(data.phone||'');
+    r['{{company}}']=esc(data.company||'');
+    r['{{city}}']=esc(data.city||'');
+    r['{{state}}']=esc(data.state||'');
+    r['{{country}}']=esc(data.country||'');
+    r['{{date}}']=new Date().toLocaleDateString();
+    r['{{time}}']=new Date().toLocaleTimeString();
+    r['{{location}}']=[data.city,data.state,data.country].filter(Boolean).join(', ');
+    r['{{tracking_id}}']=esc(data.trackingId||'');
+    r['{{lastClickedProduct}}']=esc(data.lastClickedProduct||'');
+    r['{{lastProductClickDate}}']=esc(data.lastProductClickDate||'');
+    r['{{lastClickedProductPrice}}']=esc(data.lastClickedProductPrice||'');
+    r['{{lastClickedProductURL}}']=esc(data.lastClickedProductURL||'');
+    r['{{productsClickedCount}}']=esc(data.productsClickedCount||'0');
+    r['{{ip_address}}']=esc(data.ipAddress||'');
+    r['{{ip}}']=esc(data.ipAddress||'');
+    if(data.customFields){
+      for(var k in data.customFields){
+        r['{{'+k+'}}']=esc(String(data.customFields[k]||''));
+      }
+    }
+    params.forEach(function(v,k){
+      if(!paramMap[k]&&k!=='contact_id'&&k!=='page_id'&&k.indexOf('utm_')!==0){
+        r['{{'+k+'}}']=esc(v);
+      }
+    });
+    var hasValues=false;
+    for(var key in r){if(r[key]){hasValues=true;break;}}
+    if(!hasValues)return;
+    var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{
+      acceptNode:function(n){
+        var p=n.parentNode;
+        if(p&&skipTags[p.nodeName])return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var node;
+    while(node=walker.nextNode()){
+      var txt=node.nodeValue;
+      if(txt&&txt.indexOf('{{')>-1){
+        var changed=txt;
+        for(var ph in r){
+          if(r[ph]&&changed.indexOf(ph)>-1){
+            changed=changed.split(ph).join(r[ph]);
+          }
+        }
+        if(changed!==txt)node.nodeValue=changed;
+      }
+    }
+    var attrs=['value','placeholder','content','alt','title'];
+    attrs.forEach(function(attr){
+      var els=document.querySelectorAll('['+attr+'*="{{"]');
+      for(var i=0;i<els.length;i++){
+        var tag=els[i].tagName;
+        if(skipTags[tag])continue;
+        var val=els[i].getAttribute(attr);
+        if(val){
+          var nv=val;
+          for(var ph in r){
+            if(r[ph]&&nv.indexOf(ph)>-1){
+              nv=nv.split(ph).join(r[ph]);
+            }
+          }
+          if(nv!==val)els[i].setAttribute(attr,nv);
+        }
+      }
+    });
+  }
+  function run(){
+    if(contactId){
+      var xhr=new XMLHttpRequest();
+      xhr.open('GET','https://app.vesely.ai/api/landing/context/'+encodeURIComponent(contactId)+'?page_id=3897');
+      xhr.onload=function(){
+        if(xhr.status===200){
+          try{
+            var resp=JSON.parse(xhr.responseText);
+            if(resp.success&&resp.contact){
+              var merged=resp.contact;
+              for(var k in fields){merged[k]=fields[k];}
+              doReplace(merged);
+              return;
+            }
+          }catch(e){}
+        }
+        if(hasUrlFields)doReplace(fields);
+      };
+      xhr.onerror=function(){if(hasUrlFields)doReplace(fields);};
+      xhr.send();
+    }else if(hasUrlFields){
+      doReplace(fields);
+    }
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',run);}
+  else{run();}
+})();
+</script>
+<script data-payment>
+(function(){
+  var slug='rLM7yE2';
+  var apiBase='https://app.vesely.ai';
+  function findEmail(){
+    var ids=['email','emailAddress','buyer-email','buyerEmail','user-email','userEmail','checkout-email','customer-email','contact-email'];
+    for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.value&&el.value.includes('@'))return el.value.trim();}
+    var inputs=document.querySelectorAll('input[type="email"],input[name*="email"],input[placeholder*="email"],input[placeholder*="Email"]');
+    for(var j=0;j<inputs.length;j++){if(inputs[j].value&&inputs[j].value.includes('@'))return inputs[j].value.trim();}
+    return '';
+  }
+  function findName(){
+    var ids=['name','fullName','full-name','buyer-name','buyerName','customer-name','userName','user-name'];
+    for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.value)return el.value.trim();}
+    var inputs=document.querySelectorAll('input[name*="name"]:not([name*="email"]):not([type="email"]),input[placeholder*="name"]:not([placeholder*="email"]):not([type="email"]),input[placeholder*="Name"]:not([type="email"])');
+    for(var j=0;j<inputs.length;j++){if(inputs[j].value)return inputs[j].value.trim();}
+    return '';
+  }
+  var __realProcessPayment=function(a,b,c,d,e){
+    var amountCents,email,productName,productDescription,customerName,quantity;
+    if(a&&typeof a==='object'){
+      amountCents=a.amountCents;email=a.email;productName=a.productName;
+      productDescription=a.productDescription||'';customerName=a.name||'';quantity=a.quantity||1;
+    }else{
+      amountCents=typeof a==='number'?a:0;productName=typeof b==='string'?b:'';
+      productDescription=typeof c==='string'?c:'';email='';customerName='';quantity=1;
+    }
+    if(!email)email=findEmail();
+    if(!customerName)customerName=findName();
+    if(!productName){alert('Product name is required.');return Promise.reject('no_product_name');}
+    if(!amountCents||amountCents<100){alert('Amount must be at least $1.00');return Promise.reject('invalid_amount');}
+    if(!email){alert('Please enter your email address.');return Promise.reject('no_email');}
+    var successBase=window.location.href.split('?')[0];
+    return fetch(apiBase+'/api/landing-pages/public/'+slug+'/payment/checkout',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email,name:customerName,amountCents:amountCents,productName:productName,productDescription:productDescription,quantity:quantity,successUrl:successBase+'?payment=success&product='+encodeURIComponent(productName)+'&session_id={CHECKOUT_SESSION_ID}',cancelUrl:successBase+'?payment=cancelled'})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d.checkoutUrl){window.location.href=d.checkoutUrl;}
+      else{alert(d.error||'Failed to process payment');throw new Error(d.error);}
+    });
+  };
+  Object.defineProperty(window,'__processPayment',{value:__realProcessPayment,writable:false,configurable:false});
+  document.addEventListener('DOMContentLoaded',function(){
+    var urlParams=new URLSearchParams(window.location.search);
+    if(urlParams.get('payment')==='success'){
+      var pName=urlParams.get('product')||'your item';
+      var overlay=document.createElement('div');overlay.id='payment-success-overlay';
+      overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999999;font-family:system-ui,-apple-system,sans-serif;';
+      overlay.innerHTML='<div style="background:white;border-radius:16px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.15);"><div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><h2 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#111827;">Payment Successful!</h2><p style="margin:0 0 24px;color:#6b7280;font-size:16px;">Thank you for purchasing '+pName.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'.</p><button onclick="document.getElementById(\'payment-success-overlay\').remove();window.history.replaceState({},\'\',window.location.pathname);" style="padding:12px 32px;font-size:16px;font-weight:600;background:#16a34a;color:white;border:none;border-radius:8px;cursor:pointer;">Continue</button></div>';
+      document.body.appendChild(overlay);
+    }
+  });
+})();
+</script>  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href="/acme-multipage-test/" class="logo"><span class="logo-mark"></span>ACME<span>/Solutions</span></a>
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/acme-multipage-test/">Home</a>
+      <a href="/acme-multipage-test/about" aria-current="page">About</a>
+      <a href="/acme-multipage-test/services">Services</a>
+      <a href="/acme-multipage-test/products">Products</a>
+      <a href="/acme-multipage-test/pricing">Pricing</a>
+      <a href="/acme-multipage-test/blog">Blog</a>
+      <a href="/acme-multipage-test/contact">Contact</a>
+    </nav>
+    <div class="header-cta">
+      <a href="/acme-multipage-test/contact" class="btn btn-secondary">Talk to sales</a>
+      <a href="/acme-multipage-test/pricing" class="btn btn-primary">Get started</a>
+      <button class="menu-toggle" aria-label="Open menu" id="menuToggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <a href="/acme-multipage-test/">Home</a><a href="/acme-multipage-test/about" aria-current="page">About</a><a href="/acme-multipage-test/services">Services</a><a href="/acme-multipage-test/products">Products</a><a href="/acme-multipage-test/pricing">Pricing</a><a href="/acme-multipage-test/blog">Blog</a><a href="/acme-multipage-test/contact">Contact</a>
+  </div>
+</header>
+
+
+<main>
+<section class="hero">
+  <div class="hero-decoration" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-content">
+      <span class="eyebrow">About ACME Solutions</span>
+      <h1>We started this because we'd lived the pain.</h1>
+      <p class="lead">ACME Solutions was founded by operators who spent a decade running operations at companies that grew faster than their systems. We're building the platform we wish we'd had.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="two-up">
+      <div class="card"><h3>Mission</h3><p>To give every operations team — not just the ones at trillion-dollar companies — access to the infrastructure that makes work feel coherent instead of chaotic.</p></div>
+      <div class="card"><h3>Vision</h3><p>A world where the size of your finance team doesn't determine whether your numbers reconcile, and where running a business doesn't require duct-taping fourteen tools together at 11pm.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">Our story</span>
+      <h2>Six years, three offices, no funding round we regret.</h2>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item"><div class="timeline-year">2020</div><div class="timeline-content"><h4>Founded in a garage in Brno</h4><p>Three engineers, one ex-COO, a whiteboard covered in process diagrams, and the conviction that mid-market operations didn't have to be this hard.</p></div></div>
+      <div class="timeline-item"><div class="timeline-year">2021</div><div class="timeline-content"><h4>First ten paying customers</h4><p>Logistics, light manufacturing, professional services. We learned more in those ten implementations than in the prior decade combined.</p></div></div>
+      <div class="timeline-item"><div class="timeline-year">2023</div><div class="timeline-content"><h4>SOC 2 Type II, expansion to 4 countries</h4><p>Compliance milestones unlocked the regulated verticals — banking, healthcare, energy. Headcount tripled. We learned how to hire well, mostly by hiring badly first.</p></div></div>
+      <div class="timeline-item"><div class="timeline-year">2025</div><div class="timeline-content"><h4>240+ live deployments, 92% retention</h4><p>Our customers stay. The product gets used. The unit economics work. We crossed profitability six months ahead of plan.</p></div></div>
+      <div class="timeline-item"><div class="timeline-year">2026</div><div class="timeline-content"><h4>Launching ACME Insight</h4><p>Our newest product line — operational analytics built on the same platform our customers already trust. The full suite, finally.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="team" style="background:var(--bg-alt)">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">Leadership</span>
+      <h2>The people steering this thing.</h2>
+      <p>Operators, engineers, and one accidental philosopher. We've been the customer; that's the bias we bring to the work.</p>
+    </div>
+    <div class="team-grid">
+      <article class="team-member"><div class="team-avatar team-avatar-1">JK</div><h4>Jana Kovář</h4><p class="role">Co-founder &amp; CEO</p></article>
+      <article class="team-member"><div class="team-avatar team-avatar-2">MO</div><h4>Marcus Ó Briain</h4><p class="role">Co-founder &amp; CTO</p></article>
+      <article class="team-member"><div class="team-avatar team-avatar-3">PD</div><h4>Priya Dasgupta</h4><p class="role">VP of Engineering</p></article>
+      <article class="team-member"><div class="team-avatar team-avatar-4">TH</div><h4>Tomás Herrera</h4><p class="role">Chief Customer Officer</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">What we believe</span>
+      <h2>Five principles we won't compromise on.</h2>
+    </div>
+    <div class="values-grid">
+      <article class="value-card"><h4>Boring is a feature.</h4><p>Operations infrastructure should be predictable. We optimize for fewer surprises, not more demos.</p></article>
+      <article class="value-card"><h4>Customers, not users.</h4><p>If we don't know your name, your team, and what you're trying to ship this quarter, we haven't done our job.</p></article>
+      <article class="value-card"><h4>Audit trails are sacred.</h4><p>Every action, every change, every export — logged, attributable, reversible. No exceptions, no quick fixes.</p></article>
+      <article class="value-card"><h4>We say no.</h4><p>To the wrong customer, the wrong feature, the wrong shortcut. Discipline at the front end is mercy at the back end.</p></article>
+      <article class="value-card"><h4>Compounding wins.</h4><p>Small improvements, shipped weekly, beat heroic rewrites every time. Our roadmap reflects this. So does our hiring.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-section">
+      <h2>Want to work with us — or for us?</h2>
+      <p>We're hiring across engineering, customer success, and operations. We're also always open to a conversation with new customers.</p>
+      <a href="/acme-multipage-test/contact" class="btn btn-primary">Get in touch</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/acme-multipage-test/" class="logo"><span class="logo-mark"></span>ACME<span>/Solutions</span></a>
+        <p>Operations infrastructure for teams who'd rather ship than configure. Build faster. Operate smarter.</p>
+        <form class="footer-newsletter" onsubmit="event.preventDefault();this.querySelector('button').textContent='Thanks ✓'">
+          <input type="email" placeholder="Your work email" required>
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/acme-multipage-test/about">About</a></li><li><a href="/acme-multipage-test/blog">Blog</a></li><li><a href="/acme-multipage-test/contact">Contact</a></li><li><a href="/acme-multipage-test/about#team">Careers</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a href="/acme-multipage-test/services#consulting">Consulting</a></li><li><a href="/acme-multipage-test/services#automation">Automation</a></li><li><a href="/acme-multipage-test/services#integration">Integration</a></li><li><a href="/acme-multipage-test/services#support">Support</a></li></ul></div>
+      <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Terms of service</a></li><li><a href="#">Privacy policy</a></li><li><a href="#">Cookie policy</a></li><li><a href="#">Security</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 ACME Solutions, s.r.o. All rights reserved.</span>
+      <div class="footer-social"><a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14M8.339 18.337V9.756H5.667v8.581h2.672M7.003 8.575c.835 0 1.515-.679 1.515-1.514a1.515 1.515 0 0 0-3.03 0c0 .835.679 1.514 1.515 1.514M18.338 18.337V13.64c0-2.318-.502-4.103-3.211-4.103-1.302 0-2.176.715-2.532 1.392h-.036V9.756h-2.564v8.581h2.671v-4.245c0-1.121.213-2.207 1.603-2.207 1.371 0 1.388 1.281 1.388 2.279v4.173h2.681z"/></svg></a><a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="#" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg></a></div>
+    </div>
+  </div>
+</footer>
+  <script src="script.js"></script>
+</body>
+</html>
