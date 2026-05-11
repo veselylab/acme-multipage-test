@@ -1,0 +1,1 @@
+(function(){var t=document.getElementById('menuToggle'),d=document.getElementById('mobileDrawer');if(t&&d)t.addEventListener('click',function(){d.classList.toggle('open')})})();
