@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- BASE:START (managed by Coding Agent — do not edit) -->
+<base href="/acme-multipage-test/">
+<!-- BASE:END -->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..700,30..100&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+<!-- SEO Meta Tags -->
+<title>Pricing — ACME Solutions</title>
+<meta name="description" content="Predictable monthly pricing. Starter from €290/mo, Pro from €890/mo, Enterprise custom. 14-day free trial." />
+<meta property="og:title" content="Pricing — ACME Solutions" />
+<meta property="og:description" content="Predictable monthly pricing. Starter from €290/mo, Pro from €890/mo, Enterprise custom. 14-day free trial." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Pricing — ACME Solutions" />
+<meta name="twitter:description" content="Predictable monthly pricing. Starter from €290/mo, Pro from €890/mo, Enterprise custom. 14-day free trial." />
+<!-- End SEO Meta Tags -->
+
+<script data-field-replace>
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var fields={};
+  var paramMap={
+    'first_name':'firstName','last_name':'lastName','full_name':'fullName',
+    'email':'email','phone':'phone','company':'company',
+    'city':'city','state':'state','country':'country'
+  };
+  var skipTags={'SCRIPT':1,'STYLE':1,'NOSCRIPT':1,'TEXTAREA':1,'CODE':1,'PRE':1};
+  var hasUrlFields=false;
+  for(var p in paramMap){
+    var v=params.get(p);
+    if(v){fields[paramMap[p]]=v;hasUrlFields=true;}
+  }
+  var contactId=params.get('contact_id');
+  function esc(s){
+    if(!s)return s;
+    var d=document.createElement('div');
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+  function doReplace(data){
+    var r={};
+    r['{{full_name}}']=esc(((data.firstName||'')+' '+(data.lastName||'')).trim()||((data.fullName||data.name)||''));
+    r['{{first_name}}']=esc(data.firstName||(data.name?data.name.split(' ')[0]:'')||'');
+    r['{{last_name}}']=esc(data.lastName||(data.name&&data.name.indexOf(' ')>-1?data.name.substring(data.name.indexOf(' ')+1):'')||'');
+    r['{{email}}']=esc(data.email||'');
+    r['{{phone}}']=esc(data.phone||'');
+    r['{{company}}']=esc(data.company||'');
+    r['{{city}}']=esc(data.city||'');
+    r['{{state}}']=esc(data.state||'');
+    r['{{country}}']=esc(data.country||'');
+    r['{{date}}']=new Date().toLocaleDateString();
+    r['{{time}}']=new Date().toLocaleTimeString();
+    r['{{location}}']=[data.city,data.state,data.country].filter(Boolean).join(', ');
+    r['{{tracking_id}}']=esc(data.trackingId||'');
+    r['{{lastClickedProduct}}']=esc(data.lastClickedProduct||'');
+    r['{{lastProductClickDate}}']=esc(data.lastProductClickDate||'');
+    r['{{lastClickedProductPrice}}']=esc(data.lastClickedProductPrice||'');
+    r['{{lastClickedProductURL}}']=esc(data.lastClickedProductURL||'');
+    r['{{productsClickedCount}}']=esc(data.productsClickedCount||'0');
+    r['{{ip_address}}']=esc(data.ipAddress||'');
+    r['{{ip}}']=esc(data.ipAddress||'');
+    if(data.customFields){
+      for(var k in data.customFields){
+        r['{{'+k+'}}']=esc(String(data.customFields[k]||''));
+      }
+    }
+    params.forEach(function(v,k){
+      if(!paramMap[k]&&k!=='contact_id'&&k!=='page_id'&&k.indexOf('utm_')!==0){
+        r['{{'+k+'}}']=esc(v);
+      }
+    });
+    var hasValues=false;
+    for(var key in r){if(r[key]){hasValues=true;break;}}
+    if(!hasValues)return;
+    var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{
+      acceptNode:function(n){
+        var p=n.parentNode;
+        if(p&&skipTags[p.nodeName])return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var node;
+    while(node=walker.nextNode()){
+      var txt=node.nodeValue;
+      if(txt&&txt.indexOf('{{')>-1){
+        var changed=txt;
+        for(var ph in r){
+          if(r[ph]&&changed.indexOf(ph)>-1){
+            changed=changed.split(ph).join(r[ph]);
+          }
+        }
+        if(changed!==txt)node.nodeValue=changed;
+      }
+    }
+    var attrs=['value','placeholder','content','alt','title'];
+    attrs.forEach(function(attr){
+      var els=document.querySelectorAll('['+attr+'*="{{"]');
+      for(var i=0;i<els.length;i++){
+        var tag=els[i].tagName;
+        if(skipTags[tag])continue;
+        var val=els[i].getAttribute(attr);
+        if(val){
+          var nv=val;
+          for(var ph in r){
+            if(r[ph]&&nv.indexOf(ph)>-1){
+              nv=nv.split(ph).join(r[ph]);
+            }
+          }
+          if(nv!==val)els[i].setAttribute(attr,nv);
+        }
+      }
+    });
+  }
+  function run(){
+    if(contactId){
+      var xhr=new XMLHttpRequest();
+      xhr.open('GET','https://app.vesely.ai/api/landing/context/'+encodeURIComponent(contactId)+'?page_id=3906');
+      xhr.onload=function(){
+        if(xhr.status===200){
+          try{
+            var resp=JSON.parse(xhr.responseText);
+            if(resp.success&&resp.contact){
+              var merged=resp.contact;
+              for(var k in fields){merged[k]=fields[k];}
+              doReplace(merged);
+              return;
+            }
+          }catch(e){}
+        }
+        if(hasUrlFields)doReplace(fields);
+      };
+      xhr.onerror=function(){if(hasUrlFields)doReplace(fields);};
+      xhr.send();
+    }else if(hasUrlFields){
+      doReplace(fields);
+    }
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',run);}
+  else{run();}
+})();
+</script>
+<script data-payment>
+(function(){
+  var slug='cCNDRa';
+  var apiBase='https://app.vesely.ai';
+  function findEmail(){
+    var ids=['email','emailAddress','buyer-email','buyerEmail','user-email','userEmail','checkout-email','customer-email','contact-email'];
+    for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.value&&el.value.includes('@'))return el.value.trim();}
+    var inputs=document.querySelectorAll('input[type="email"],input[name*="email"],input[placeholder*="email"],input[placeholder*="Email"]');
+    for(var j=0;j<inputs.length;j++){if(inputs[j].value&&inputs[j].value.includes('@'))return inputs[j].value.trim();}
+    return '';
+  }
+  function findName(){
+    var ids=['name','fullName','full-name','buyer-name','buyerName','customer-name','userName','user-name'];
+    for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.value)return el.value.trim();}
+    var inputs=document.querySelectorAll('input[name*="name"]:not([name*="email"]):not([type="email"]),input[placeholder*="name"]:not([placeholder*="email"]):not([type="email"]),input[placeholder*="Name"]:not([type="email"])');
+    for(var j=0;j<inputs.length;j++){if(inputs[j].value)return inputs[j].value.trim();}
+    return '';
+  }
+  var __realProcessPayment=function(a,b,c,d,e){
+    var amountCents,email,productName,productDescription,customerName,quantity;
+    if(a&&typeof a==='object'){
+      amountCents=a.amountCents;email=a.email;productName=a.productName;
+      productDescription=a.productDescription||'';customerName=a.name||'';quantity=a.quantity||1;
+    }else{
+      amountCents=typeof a==='number'?a:0;productName=typeof b==='string'?b:'';
+      productDescription=typeof c==='string'?c:'';email='';customerName='';quantity=1;
+    }
+    if(!email)email=findEmail();
+    if(!customerName)customerName=findName();
+    if(!productName){alert('Product name is required.');return Promise.reject('no_product_name');}
+    if(!amountCents||amountCents<100){alert('Amount must be at least $1.00');return Promise.reject('invalid_amount');}
+    if(!email){alert('Please enter your email address.');return Promise.reject('no_email');}
+    var successBase=window.location.href.split('?')[0];
+    return fetch(apiBase+'/api/landing-pages/public/'+slug+'/payment/checkout',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email,name:customerName,amountCents:amountCents,productName:productName,productDescription:productDescription,quantity:quantity,successUrl:successBase+'?payment=success&product='+encodeURIComponent(productName)+'&session_id={CHECKOUT_SESSION_ID}',cancelUrl:successBase+'?payment=cancelled'})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d.checkoutUrl){window.location.href=d.checkoutUrl;}
+      else{alert(d.error||'Failed to process payment');throw new Error(d.error);}
+    });
+  };
+  Object.defineProperty(window,'__processPayment',{value:__realProcessPayment,writable:false,configurable:false});
+  document.addEventListener('DOMContentLoaded',function(){
+    var urlParams=new URLSearchParams(window.location.search);
+    if(urlParams.get('payment')==='success'){
+      var pName=urlParams.get('product')||'your item';
+      var overlay=document.createElement('div');overlay.id='payment-success-overlay';
+      overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999999;font-family:system-ui,-apple-system,sans-serif;';
+      overlay.innerHTML='<div style="background:white;border-radius:16px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.15);"><div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><h2 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#111827;">Payment Successful!</h2><p style="margin:0 0 24px;color:#6b7280;font-size:16px;">Thank you for purchasing '+pName.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'.</p><button onclick="document.getElementById(\'payment-success-overlay\').remove();window.history.replaceState({},\'\',window.location.pathname);" style="padding:12px 32px;font-size:16px;font-weight:600;background:#16a34a;color:white;border:none;border-radius:8px;cursor:pointer;">Continue</button></div>';
+      document.body.appendChild(overlay);
+    }
+  });
+})();
+</script>  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href="/acme-multipage-test/" class="logo"><span class="logo-mark"></span>ACME<span>/Solutions</span></a>
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/acme-multipage-test/">Home</a><a href="/acme-multipage-test/about">About</a><a href="/acme-multipage-test/services">Services</a><a href="/acme-multipage-test/products">Products</a><a href="/acme-multipage-test/pricing" aria-current="page">Pricing</a><a href="/acme-multipage-test/blog">Blog</a><a href="/acme-multipage-test/contact">Contact</a>
+    </nav>
+    <div class="header-cta">
+      <a href="/acme-multipage-test/contact" class="btn btn-secondary">Talk to sales</a>
+      <a href="/acme-multipage-test/pricing" class="btn btn-primary">Get started</a>
+      <button class="menu-toggle" id="menuToggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <a href="/acme-multipage-test/">Home</a><a href="/acme-multipage-test/about">About</a><a href="/acme-multipage-test/services">Services</a><a href="/acme-multipage-test/products">Products</a><a href="/acme-multipage-test/pricing" aria-current="page">Pricing</a><a href="/acme-multipage-test/blog">Blog</a><a href="/acme-multipage-test/contact">Contact</a>
+  </div>
+</header>
+
+
+<main>
+<section class="hero">
+  <div class="hero-decoration" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-content">
+      <span class="eyebrow">Pricing</span>
+      <h1>Predictable pricing. No "contact us" for everything.</h1>
+      <p class="lead">Two of our three plans have published prices. The third doesn't, because Enterprise pricing genuinely depends on what you need — and we'd rather have a real conversation than publish a number you'll have to ignore anyway.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="pricing-grid">
+      <article class="pricing-card">
+        <h3>Starter</h3>
+        <p style="margin-top:8px;font-size:.9375rem">For teams getting their first workflows in order.</p>
+        <div class="price">€290<span class="price-period"> /month</span></div>
+        <ul>
+          <li>Up to 10 active users</li><li>ACME Core (workflow engine + documents)</li><li>10 prebuilt connectors</li><li>Email support, 24h response</li><li>SOC 2 audit trail</li><li>Standard API access</li>
+        </ul>
+        <a href="/acme-multipage-test/contact" class="btn btn-secondary">Start free trial</a>
+      </article>
+      <article class="pricing-card featured">
+        <span class="badge">Most popular</span>
+        <h3>Pro</h3>
+        <p style="margin-top:8px;font-size:.9375rem">For operations teams running real volume.</p>
+        <div class="price">€890<span class="price-period"> /month</span></div>
+        <ul>
+          <li>Up to 50 active users</li><li>Core + Flow (visual automation)</li><li>All 40+ connectors included</li><li>Priority support, 4h response</li><li>Named technical contact</li><li>Quarterly business reviews</li><li>Advanced API + webhooks</li>
+        </ul>
+        <a href="/acme-multipage-test/contact" class="btn btn-primary">Start free trial</a>
+      </article>
+      <article class="pricing-card">
+        <h3>Enterprise</h3>
+        <p style="margin-top:8px;font-size:.9375rem">For regulated industries and complex stacks.</p>
+        <div class="price">Custom<span class="price-period"> pricing</span></div>
+        <ul>
+          <li>Unlimited users</li><li>Full suite: Core + Flow + Insight</li><li>Custom connectors &amp; middleware</li><li>24/7 support with documented SLAs</li><li>Dedicated engineering team</li><li>Single-tenant or VPC deployment</li><li>BAA, DPA, and on-site implementation</li>
+        </ul>
+        <a href="/acme-multipage-test/contact" class="btn btn-secondary">Talk to sales</a>
+      </article>
+    </div>
+    <p style="text-align:center;margin-top:32px;font-size:.875rem;color:var(--muted)">All plans billed monthly or annually (15% discount). 14-day free trial. No credit card required.</p>
+  </div>
+</section>
+
+<section class="section" style="background:var(--bg-alt)">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">Compare plans</span>
+      <h2>What's actually included at each tier.</h2>
+    </div>
+    <div class="compare-table-wrapper">
+      <table class="compare-table">
+        <thead><tr><th>Feature</th><th>Starter</th><th>Pro</th><th>Enterprise</th></tr></thead>
+        <tbody>
+          <tr><td>Active users</td><td>10</td><td>50</td><td>Unlimited</td></tr>
+          <tr><td>Workflow runs / month</td><td>5,000</td><td>50,000</td><td>Unlimited</td></tr>
+          <tr><td>Document storage</td><td>50 GB</td><td>500 GB</td><td>Unlimited</td></tr>
+          <tr><td>ACME Core</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td>ACME Flow (automation)</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td>ACME Insight (analytics)</td><td class="dash">—</td><td>Add-on</td><td class="check">✓</td></tr>
+          <tr><td>Prebuilt connectors</td><td>10</td><td>All 40+</td><td>All 40+ &amp; custom</td></tr>
+          <tr><td>API rate limit</td><td>60 / min</td><td>600 / min</td><td>Custom</td></tr>
+          <tr><td>Support response time</td><td>24h</td><td>4h</td><td>1h, 24/7</td></tr>
+          <tr><td>Named TAM</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓ + team</td></tr>
+          <tr><td>SOC 2 / ISO 27001 audit log</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Single-tenant / VPC deployment</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td></tr>
+          <tr><td>BAA / DPA</td><td class="dash">—</td><td>DPA</td><td>BAA + DPA</td></tr>
+          <tr><td>Uptime SLA</td><td>99.5%</td><td>99.9%</td><td>99.99%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container-narrow">
+    <div class="section-heading text-center">
+      <span class="eyebrow">FAQ</span>
+      <h2>Pricing questions, answered honestly.</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq"><summary>What does the free trial actually include?</summary><p>Full access to the Pro tier for 14 days. All connectors, all features, no feature gating. We'd rather you discover the real product is too expensive than the cheap product is too limited.</p></details>
+      <details class="faq"><summary>Do you charge per user, per workflow, or per integration?</summary><p>Per active user, with generous workflow and storage limits at each tier. We don't meter integrations or charge per connector — that pricing model creates perverse incentives we'd rather avoid.</p></details>
+      <details class="faq"><summary>What counts as an "active user"?</summary><p>A user account that took at least one action in the platform within the billing month. Read-only viewers and external collaborators (customers, suppliers, auditors with limited access) don't count toward your seat total.</p></details>
+      <details class="faq"><summary>Can we change plans mid-contract?</summary><p>Upgrade any time, prorated. Downgrade at the end of your billing cycle. We don't lock customers into multi-year contracts to make this difficult — annual is the standard, monthly is available if you'd prefer.</p></details>
+      <details class="faq"><summary>What's included in implementation, and what's extra?</summary><p>Pro plans include 16 hours of implementation services. Enterprise plans include a fixed-scope implementation (typically 4–8 weeks). Beyond that, we charge a published day rate — listed in the contract, not invented later.</p></details>
+      <details class="faq"><summary>Are there volume discounts?</summary><p>Yes, for annual contracts above 100 users or multi-product deployments. Reach out and we'll send a written proposal. We don't do "make us an offer" pricing — you'll know exactly what you're paying.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-section">
+      <h2>Still not sure which plan fits?</h2>
+      <p>Twenty minutes with our team and a few questions about your stack — we'll tell you which plan we'd recommend and why.</p>
+      <a href="/acme-multipage-test/contact" class="btn btn-primary">Talk to a human</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/acme-multipage-test/" class="logo"><span class="logo-mark"></span>ACME<span>/Solutions</span></a>
+        <p>Operations infrastructure for teams who'd rather ship than configure. Build faster. Operate smarter.</p>
+        <form class="footer-newsletter" onsubmit="event.preventDefault();this.querySelector('button').textContent='Thanks ✓'"><input type="email" placeholder="Your work email" required><button type="submit">Subscribe</button></form>
+      </div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/acme-multipage-test/about">About</a></li><li><a href="/acme-multipage-test/blog">Blog</a></li><li><a href="/acme-multipage-test/contact">Contact</a></li><li><a href="/acme-multipage-test/about#team">Careers</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a href="/acme-multipage-test/services#consulting">Consulting</a></li><li><a href="/acme-multipage-test/services#automation">Automation</a></li><li><a href="/acme-multipage-test/services#integration">Integration</a></li><li><a href="/acme-multipage-test/services#support">Support</a></li></ul></div>
+      <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Terms of service</a></li><li><a href="#">Privacy policy</a></li><li><a href="#">Cookie policy</a></li><li><a href="#">Security</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 ACME Solutions, s.r.o.</span><div class="footer-social"><a href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14M8.339 18.337V9.756H5.667v8.581h2.672M7.003 8.575c.835 0 1.515-.679 1.515-1.514a1.515 1.515 0 0 0-3.03 0c0 .835.679 1.514 1.515 1.514M18.338 18.337V13.64c0-2.318-.502-4.103-3.211-4.103-1.302 0-2.176.715-2.532 1.392h-.036V9.756h-2.564v8.581h2.671v-4.245c0-1.121.213-2.207 1.603-2.207 1.371 0 1.388 1.281 1.388 2.279v4.173h2.681z"/></svg></a><a href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg></a></div></div>
+  </div>
+</footer>
+  <script src="script.js"></script>
+</body>
+</html>
