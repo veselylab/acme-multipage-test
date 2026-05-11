@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- BASE:START (managed by Coding Agent — do not edit) -->
+<base href="/acme-multipage-test/">
+<!-- BASE:END -->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..700,30..100&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+<!-- SEO Meta Tags -->
+<title>ACME Insight is here — ACME Solutions</title>
+<meta name="description" content="ACME Insight — operational analytics on data you already trust — is generally available. The story behind the launch." />
+<meta property="og:title" content="ACME Insight is here — ACME Solutions" />
+<meta property="og:description" content="ACME Insight — operational analytics on data you already trust — is generally available. The story behind the launch." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="ACME Insight is here — ACME Solutions" />
+<meta name="twitter:description" content="ACME Insight — operational analytics on data you already trust — is generally available. The story behind the launch." />
+<!-- End SEO Meta Tags -->
+
+<script data-field-replace>
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var fields={};
+  var paramMap={
+    'first_name':'firstName','last_name':'lastName','full_name':'fullName',
+    'email':'email','phone':'phone','company':'company',
+    'city':'city','state':'state','country':'country'
+  };
+  var skipTags={'SCRIPT':1,'STYLE':1,'NOSCRIPT':1,'TEXTAREA':1,'CODE':1,'PRE':1};
+  var hasUrlFields=false;
+  for(var p in paramMap){
+    var v=params.get(p);
+    if(v){fields[paramMap[p]]=v;hasUrlFields=true;}
+  }
+  var contactId=params.get('contact_id');
+  function esc(s){
+    if(!s)return s;
+    var d=document.createElement('div');
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+  function doReplace(data){
+    var r={};
+    r['{{full_name}}']=esc(((data.firstName||'')+' '+(data.lastName||'')).trim()||((data.fullName||data.name)||''));
+    r['{{first_name}}']=esc(data.firstName||(data.name?data.name.split(' ')[0]:'')||'');
+    r['{{last_name}}']=esc(data.lastName||(data.name&&data.name.indexOf(' ')>-1?data.name.substring(data.name.indexOf(' ')+1):'')||'');
+    r['{{email}}']=esc(data.email||'');
+    r['{{phone}}']=esc(data.phone||'');
+    r['{{company}}']=esc(data.company||'');
+    r['{{city}}']=esc(data.city||'');
+    r['{{state}}']=esc(data.state||'');
+    r['{{country}}']=esc(data.country||'');
+    r['{{date}}']=new Date().toLocaleDateString();
+    r['{{time}}']=new Date().toLocaleTimeString();
+    r['{{location}}']=[data.city,data.state,data.country].filter(Boolean).join(', ');
+    r['{{tracking_id}}']=esc(data.trackingId||'');
+    r['{{lastClickedProduct}}']=esc(data.lastClickedProduct||'');
+    r['{{lastProductClickDate}}']=esc(data.lastProductClickDate||'');
+    r['{{lastClickedProductPrice}}']=esc(data.lastClickedProductPrice||'');
+    r['{{lastClickedProductURL}}']=esc(data.lastClickedProductURL||'');
+    r['{{productsClickedCount}}']=esc(data.productsClickedCount||'0');
+    r['{{ip_address}}']=esc(data.ipAddress||'');
+    r['{{ip}}']=esc(data.ipAddress||'');
+    if(data.customFields){
+      for(var k in data.customFields){
+        r['{{'+k+'}}']=esc(String(data.customFields[k]||''));
+      }
+    }
+    params.forEach(function(v,k){
+      if(!paramMap[k]&&k!=='contact_id'&&k!=='page_id'&&k.indexOf('utm_')!==0){
+        r['{{'+k+'}}']=esc(v);
+      }
+    });
+    var hasValues=false;
+    for(var key in r){if(r[key]){hasValues=true;break;}}
+    if(!hasValues)return;
+    var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{
+      acceptNode:function(n){
+        var p=n.parentNode;
+        if(p&&skipTags[p.nodeName])return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var node;
+    while(node=walker.nextNode()){
+      var txt=node.nodeValue;
+      if(txt&&txt.indexOf('{{')>-1){
+        var changed=txt;
+        for(var ph in r){
+          if(r[ph]&&changed.indexOf(ph)>-1){
+            changed=changed.split(ph).join(r[ph]);
+          }
+        }
+        if(changed!==txt)node.nodeValue=changed;
+      }
+    }
+    var attrs=['value','placeholder','content','alt','title'];
+    attrs.forEach(function(attr){
+      var els=document.querySelectorAll('['+attr+'*="{{"]');
+      for(var i=0;i<els.length;i++){
+        var tag=els[i].tagName;
+        if(skipTags[tag])continue;
+        var val=els[i].getAttribute(attr);
+        if(val){
+          var nv=val;
+          for(var ph in r){
+            if(r[ph]&&nv.indexOf(ph)>-1){
+              nv=nv.split(ph).join(r[ph]);
+            }
+          }
+          if(nv!==val)els[i].setAttribute(attr,nv);
+        }
+      }
+    });
+  }
+  function run(){
+    if(contactId){
+      var xhr=new XMLHttpRequest();
+      xhr.open('GET','https://app.vesely.ai/api/landing/context/'+encodeURIComponent(contactId)+'?page_id=3908');
+      xhr.onload=function(){
+        if(xhr.status===200){
+          try{
+            var resp=JSON.parse(xhr.responseText);
+            if(resp.success&&resp.contact){
+              var merged=resp.contact;
+              for(var k in fields){merged[k]=fields[k];}
+              doReplace(merged);
+              return;
+            }
+          }catch(e){}
+        }
+        if(hasUrlFields)doReplace(fields);
+      };
+      xhr.onerror=function(){if(hasUrlFields)doReplace(fields);};
+      xhr.send();
+    }else if(hasUrlFields){
+      doReplace(fields);
+    }
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',run);}
+  else{run();}
+})();
+</script>
+<script data-payment>
+(function(){
+  var slug='ffy9MZi';
+  var apiBase='https://app.vesely.ai';
+  function findEmail(){
+    var ids=['email','emailAddress','buyer-email','buyerEmail','user-email','userEmail','checkout-email','customer-email','contact-email'];
+    for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.value&&el.value.includes('@'))return el.value.trim();}
+    var inputs=document.querySelectorAll('input[type="email"],input[name*="email"],input[placeholder*="email"],input[placeholder*="Email"]');
+    for(var j=0;j<inputs.length;j++){if(inputs[j].value&&inputs[j].value.includes('@'))return inputs[j].value.trim();}
+    return '';
+  }
+  function findName(){
+    var ids=['name','fullName','full-name','buyer-name','buyerName','customer-name','userName','user-name'];
+    for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.value)return el.value.trim();}
+    var inputs=document.querySelectorAll('input[name*="name"]:not([name*="email"]):not([type="email"]),input[placeholder*="name"]:not([placeholder*="email"]):not([type="email"]),input[placeholder*="Name"]:not([type="email"])');
+    for(var j=0;j<inputs.length;j++){if(inputs[j].value)return inputs[j].value.trim();}
+    return '';
+  }
+  var __realProcessPayment=function(a,b,c,d,e){
+    var amountCents,email,productName,productDescription,customerName,quantity;
+    if(a&&typeof a==='object'){
+      amountCents=a.amountCents;email=a.email;productName=a.productName;
+      productDescription=a.productDescription||'';customerName=a.name||'';quantity=a.quantity||1;
+    }else{
+      amountCents=typeof a==='number'?a:0;productName=typeof b==='string'?b:'';
+      productDescription=typeof c==='string'?c:'';email='';customerName='';quantity=1;
+    }
+    if(!email)email=findEmail();
+    if(!customerName)customerName=findName();
+    if(!productName){alert('Product name is required.');return Promise.reject('no_product_name');}
+    if(!amountCents||amountCents<100){alert('Amount must be at least $1.00');return Promise.reject('invalid_amount');}
+    if(!email){alert('Please enter your email address.');return Promise.reject('no_email');}
+    var successBase=window.location.href.split('?')[0];
+    return fetch(apiBase+'/api/landing-pages/public/'+slug+'/payment/checkout',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email,name:customerName,amountCents:amountCents,productName:productName,productDescription:productDescription,quantity:quantity,successUrl:successBase+'?payment=success&product='+encodeURIComponent(productName)+'&session_id={CHECKOUT_SESSION_ID}',cancelUrl:successBase+'?payment=cancelled'})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d.checkoutUrl){window.location.href=d.checkoutUrl;}
+      else{alert(d.error||'Failed to process payment');throw new Error(d.error);}
+    });
+  };
+  Object.defineProperty(window,'__processPayment',{value:__realProcessPayment,writable:false,configurable:false});
+  document.addEventListener('DOMContentLoaded',function(){
+    var urlParams=new URLSearchParams(window.location.search);
+    if(urlParams.get('payment')==='success'){
+      var pName=urlParams.get('product')||'your item';
+      var overlay=document.createElement('div');overlay.id='payment-success-overlay';
+      overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999999;font-family:system-ui,-apple-system,sans-serif;';
+      overlay.innerHTML='<div style="background:white;border-radius:16px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.15);"><div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><h2 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#111827;">Payment Successful!</h2><p style="margin:0 0 24px;color:#6b7280;font-size:16px;">Thank you for purchasing '+pName.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'.</p><button onclick="document.getElementById(\'payment-success-overlay\').remove();window.history.replaceState({},\'\',window.location.pathname);" style="padding:12px 32px;font-size:16px;font-weight:600;background:#16a34a;color:white;border:none;border-radius:8px;cursor:pointer;">Continue</button></div>';
+      document.body.appendChild(overlay);
+    }
+  });
+})();
+</script>  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href="/acme-multipage-test/" class="logo"><span class="logo-mark"></span>ACME<span>/Solutions</span></a>
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/acme-multipage-test/">Home</a><a href="/acme-multipage-test/about">About</a><a href="/acme-multipage-test/services">Services</a><a href="/acme-multipage-test/products">Products</a><a href="/acme-multipage-test/pricing">Pricing</a><a href="/acme-multipage-test/blog" aria-current="page">Blog</a><a href="/acme-multipage-test/contact">Contact</a>
+    </nav>
+    <div class="header-cta">
+      <a href="/acme-multipage-test/contact" class="btn-secondary">Talk to sales</a>
+      <a href="/acme-multipage-test/pricing" class="btn-primary">Get started</a>
+      <button class="menu-toggle" id="menuToggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <a href="/acme-multipage-test/">Home</a><a href="/acme-multipage-test/about">About</a><a href="/acme-multipage-test/services">Services</a><a href="/acme-multipage-test/products">Products</a><a href="/acme-multipage-test/pricing">Pricing</a><a href="/acme-multipage-test/blog" aria-current="page">Blog</a><a href="/acme-multipage-test/contact">Contact</a>
+  </div>
+</header>
+
+
+<main>
+<section style="padding:56px 0 80px">
+  <div class="container">
+    <article class="article">
+      <header class="article-header">
+        <span class="blog-tag">Product</span>
+        <h1>ACME Insight is here: operational analytics on data you already trust.</h1>
+        <div class="article-meta">
+          <div class="avatar">JK</div>
+          <div class="author-info"><strong>Jana Kovář</strong> — Co-founder &amp; CEO<br>May 7, 2026 · 8 min read</div>
+        </div>
+      </header>
+      <div class="article-hero-image" role="img" aria-label="Cover image"></div>
+      <div class="article-body">
+        <p>After two years in private beta with twenty-three customers, ACME Insight is now generally available to every Pro and Enterprise account. It's the third — and we suspect final — pillar of the suite. We held the launch six months longer than the roadmap said we would, and that's most of what this post is about.</p>
+        <p>The pitch is straightforward: <strong>operational analytics built on the platform your team already trusts.</strong> Same data model. Same audit trail. Same permissions. No CSV exports, no separate BI tool, no four-week onboarding from a different vendor. You enable Insight, you point it at your existing workflows, and you get dashboards in roughly an hour.</p>
+        <h2>Why we waited</h2>
+        <p>The temptation in our position — a profitable platform company with a long customer waitlist — is to ship adjacent products on the original momentum and figure out the details later. We've watched several peers do exactly this, and we've watched their NPS scores reflect it.</p>
+        <p>We held Insight back for three reasons:</p>
+        <ol>
+          <li>The first version benchmarked against industry data, which sounded great in marketing materials and turned out to be useless in practice. Customers wanted to compare themselves to their own historical baselines, not to anonymized peers in adjacent verticals.</li>
+          <li>Anomaly detection in v1 generated four times more alerts than we'd projected. We had to rebuild the model from scratch around a confidence-weighted approach that surfaces the things actually worth a human's attention.</li>
+          <li>The permissions model didn't extend cleanly. Insight surfaced data that some viewers shouldn't have seen, and the fix required changes to the underlying platform — not just the new product.</li>
+        </ol>
+        <div class="callout">
+          <strong>Lesson from v1</strong>
+          <p>Industry benchmarks make great marketing copy and lousy product. The most compelling comparison isn't to other companies — it's to last quarter's version of yourself. We rebuilt around that insight and the entire product made more sense.</p>
+        </div>
+        <h2>What's in the box</h2>
+        <p>The GA release ships with everything our beta cohort told us was non-negotiable, and a few things we added in the final stretch:</p>
+        <ul>
+          <li><strong>Real-time dashboards</strong> across workflow throughput, exception rates, cycle times, and SLA adherence — built on the same data layer as Core and Flow, no ETL required</li>
+          <li><strong>Anomaly detection</strong> with configurable confidence thresholds; alerts route through your existing notification channels</li>
+          <li><strong>Historical benchmarking</strong> against your own data — month-over-month, quarter-over-quarter, year-over-year, with seasonality adjustment</li>
+          <li><strong>Custom metric builder</strong> for the operational KPIs that don't fit our standard library</li>
+          <li><strong>Scheduled reporting</strong> — the same dashboards, delivered as branded PDFs to your board or your customer's compliance team</li>
+        </ul>
+        <h2>What we learned about beta cohorts</h2>
+        <p>Twenty-three customers turned out to be exactly the right number. Twelve would have been too few — we wouldn't have caught the edge cases. Forty would have been too many — we couldn't have responded fast enough to the patterns we were seeing.</p>
+        <blockquote class="pull">"The beta wasn't a feature freeze. It was the first six months of the product's life, with the right group of people telling us what was actually broken."</blockquote>
+        <p>The beta program ran on a simple deal: customers got Insight at no charge for the duration of the program, and committed to a weekly thirty-minute call with the product team. We honored that commitment on both sides. The product is materially better for it.</p>
+        <h3>What's next for Insight</h3>
+        <p>Two themes for the rest of 2026: <strong>natural-language query</strong> ("show me last month's exception rate by team") and <strong>predictive operations</strong> — using your historical patterns to surface what's likely to break before it does. Both are in early prototyping. We'll publish more once we know they work.</p>
+        <p>If you're already on Pro or Enterprise, Insight is in your dashboard now. If you're not — well, you know where the contact page is.</p>
+        <p style="color:var(--muted);font-style:italic;margin-top:48px">— Jana</p>
+      </div>
+      <div class="author-bio">
+        <div class="avatar">JK</div>
+        <div>
+          <strong>Jana Kovář</strong>
+          <p class="role">Co-founder &amp; CEO at ACME Solutions</p>
+          <p>Previously COO at a logistics company that grew from 30 to 400 people in four years. Most of ACME's product roadmap is, in some way, an attempt to fix problems she lived through there.</p>
+        </div>
+      </div>
+      <section class="related-section">
+        <h2>Related articles</h2>
+        <div class="related-grid">
+          <article class="blog-card">
+            <a href="#" class="blog-image blog-image-2"></a>
+            <span class="blog-tag">Engineering</span>
+            <h3><a href="#">How we cut deployment time from six weeks to nine days</a></h3>
+            <div class="blog-meta"><span>Marcus Ó Briain</span><span>April 28, 2026</span></div>
+          </article>
+          <article class="blog-card">
+            <a href="#" class="blog-image blog-image-3"></a>
+            <span class="blog-tag">Customer story</span>
+            <h3><a href="#">Halberd Manufacturing: four FTEs reclaimed in six weeks</a></h3>
+            <div class="blog-meta"><span>Tomás Herrera</span><span>April 14, 2026</span></div>
+          </article>
+          <article class="blog-card">
+            <a href="#" class="blog-image"></a>
+            <span class="blog-tag">Product</span>
+            <h3><a href="#">Why we shipped 47 connectors before building our own analytics</a></h3>
+            <div class="blog-meta"><span>Jana Kovář</span><span>February 28, 2026</span></div>
+          </article>
+        </div>
+      </section>
+    </article>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/acme-multipage-test/" class="logo"><span class="logo-mark"></span>ACME<span>/Solutions</span></a>
+        <p>Operations infrastructure for teams who'd rather ship than configure. Build faster. Operate smarter.</p>
+        <form class="footer-newsletter" onsubmit="event.preventDefault();this.querySelector('button').textContent='Thanks ✓'"><input type="email" placeholder="Your work email" required><button type="submit">Subscribe</button></form>
+      </div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/acme-multipage-test/about">About</a></li><li><a href="/acme-multipage-test/blog">Blog</a></li><li><a href="/acme-multipage-test/contact">Contact</a></li><li><a href="/acme-multipage-test/about#team">Careers</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a href="/acme-multipage-test/services#consulting">Consulting</a></li><li><a href="/acme-multipage-test/services#automation">Automation</a></li><li><a href="/acme-multipage-test/services#integration">Integration</a></li><li><a href="/acme-multipage-test/services#support">Support</a></li></ul></div>
+      <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Terms of service</a></li><li><a href="#">Privacy policy</a></li><li><a href="#">Cookie policy</a></li><li><a href="#">Security</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 ACME Solutions, s.r.o.</span><div class="footer-social"><a href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14M8.339 18.337V9.756H5.667v8.581h2.672M7.003 8.575c.835 0 1.515-.679 1.515-1.514a1.515 1.515 0 0 0-3.03 0c0 .835.679 1.514 1.515 1.514M18.338 18.337V13.64c0-2.318-.502-4.103-3.211-4.103-1.302 0-2.176.715-2.532 1.392h-.036V9.756h-2.564v8.581h2.671v-4.245c0-1.121.213-2.207 1.603-2.207 1.371 0 1.388 1.281 1.388 2.279v4.173h2.681z"/></svg></a><a href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg></a></div></div>
+  </div>
+</footer>
+  <script src="script.js"></script>
+</body>
+</html>
